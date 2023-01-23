@@ -28,6 +28,12 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+    - name: build
+      run: docker build -t chandu
+    - name: tag
+      run: docker tag chandu:latest 240037424121.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
+    - name: push
+      run: docker push 240037424121.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
       
 
   
