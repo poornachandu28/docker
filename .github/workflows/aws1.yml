@@ -66,6 +66,8 @@ jobs:
       run: docker ps -q -a
     - name: showing a list of running containers
       run: docker ps
+    - name: terraform
+      run: terraform destroy
       
 
   
