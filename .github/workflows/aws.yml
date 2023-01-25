@@ -38,7 +38,7 @@ jobs:
     - name: terraform directory
       run : mkdir terraform
     - name: ading file
-      run : cp main.tf terraform
+      run : cp terraform.tf terraform
     - uses: actions/checkout@v3
     - name: creating directory
       run: mkdir hello
