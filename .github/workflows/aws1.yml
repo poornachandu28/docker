@@ -31,9 +31,9 @@ jobs:
     - name: build
       run: docker build -t chandu .
     - name: tag
-      run: docker tag chandu:latest 240037424121.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
+      run: docker tag chandu:latest 715279903930.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
     - name: push
-      run: docker push 240037424121.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
+      run: docker push 715279903930.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
       
     - name: terraform directory
       run : mkdir terraform
@@ -57,9 +57,9 @@ jobs:
     - name: building
       run: terraform apply -auto-approve
     - name: pulling
-      run: docker pull 240037424121.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
+      run: docker pull 715279903930.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
     - name: running image
-      run: docker run 240037424121.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
+      run: docker run 715279903930.dkr.ecr.us-west-1.amazonaws.com/chandu:latest
     - name: showing a list all container
       run: docker ps -a
     - name: to start containers
