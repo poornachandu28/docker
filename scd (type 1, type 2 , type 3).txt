@@ -1,0 +1,258 @@
+mysql> desc employee;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| emp_id   | int         | NO   | PRI | NULL    |       |
+| emp_name | varchar(20) | YES  |     | NULL    |       |
+| salary   | int         | YES  |     | NULL    |       |
+| company  | varchar(20) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc employee_history;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| emp_id        | int         | YES  |     | NULL    |       |
+| emp_name      | varchar(20) | YES  |     | NULL    |       |
+| salary        | int         | YES  |     | NULL    |       |
+| company       | varchar(20) | YES  |     | NULL    |       |
+| pre_company   | varchar(20) | YES  |     | NULL    |       |
+| starting_date | DATE        | YES  |     | NULL    |       |
+| end_date      | DATE        | YES  |     | NULL    |       |
+| indicator     | varchar(10) | YES  |     | NULL    |       |
+| surrogate_key | int         | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
+
+mysql>
+    
+[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+
+
+DELIMITER $$
+CREATE TRIGGER trigger1
+AFTER insert ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO employee_history (emp_id,emp_Name,salary,company,pre_company,Starting_Date, End_Date,indicator,surrogate_key)
+  VALUES (new.emp_id,new.emp_name,new.salary,new.company,"-",now(),null,"Y",1);
+END $$
+DELIMITER ;
+
+
+uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+
+DELIMITER $$
+CREATE TRIGGER trigger3
+AFTER update ON employee
+FOR EACH ROW
+BEGIN
+if new.salary != old.salary then
+  UPDATE employee_history
+  SET End_Date = starting_date-1, indicator = 'N'
+  WHERE emp_id = OLD.emp_id AND  new.salary != old.salary AND indicator="Y"; 
+end if;
+END $$
+DELIMITER ;
+=========================================================================================================================================================================
+
+DELIMITER $$
+CREATE TRIGGER trigger5
+AFTER update ON employee
+FOR EACH ROW
+BEGIN
+  if new.salary != old.salary then
+    INSERT INTO employee_history (emp_id,emp_Name,salary,company,Starting_Date, End_Date,indicator)
+    VALUES (new.emp_id,new.emp_name,new.salary,new.company,now(),null,"Y" ); 
+  end if;
+END $$
+DELIMITER ;
+=========================================================================================================================================================================
+
+DELIMITER $$
+CREATE TRIGGER TRIGGER4
+AFTER UPDATE ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+IF OLD.emp_name!=NEW.emp_name THEN
+	UPDATE EMPloyee_HISTORY SET emp_name=new.emp_name WHERE emp_id=NEW.emp_id;
+END IF;
+END $$
+DELIMITER ;
+
+
+
+
+
+DELIMITER $$
+CREATE TRIGGER TRIGGER6
+AFTER UPDATE ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+IF OLD.company!=NEW.company THEN
+	UPDATE EMPloyee_HISTORY SET company=new.company,pre_company=old.company WHERE emp_id=NEW.emp_id;
+END IF;
+END $$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE TRIGGER reset_surrogate_key
+BEFORE INSERT ON employee_history
+FOR EACH ROW
+BEGIN
+  DECLARE max_surrogate_key INT;
+  DECLARE max_emp_id INT;
+  SELECT MAX(surrogate_key), MAX(emp_id) INTO max_surrogate_key, max_emp_id FROM employee_history WHERE emp_id = NEW.emp_id;
+  IF max_emp_id IS NULL THEN
+    SET max_emp_id = 0;
+  END IF;
+  IF max_surrogate_key IS NULL THEN
+    SET max_surrogate_key = 0;
+  END IF;
+  IF max_emp_id = NEW.emp_id THEN
+    SET NEW.surrogate_key = max_surrogate_key + 1;
+  ELSE
+    SET NEW.surrogate_key = 1;
+  END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER reset
+BEFORE INSERT ON employee_history
+FOR EACH ROW
+BEGIN
+  DECLARE pre varchar(20);
+  DECLARE max_emp_id INT;
+  SELECT  pre_company,MAX(emp_id) INTO pre,max_emp_id FROM employee_history WHERE emp_id = NEW.emp_id;
+  IF max_emp_id = NEW.emp_id THEN
+  SET NEW.pre_company = pre;
+  END IF;
+  
+END$$
+DELIMITER ;
+
+==========================================================================================================================================================================
+
+mysql> insert into employee values(1,"poorna",30000,"hcl");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> update employee
+    -> set salary=45000
+    -> where emp_id=1;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+mysql> select * from employee_history;
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+| emp_id | emp_Name | salary | company | pre_company | Starting_Date | End_Date   | indicator | surrogate_key |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+|      1 | poorna   |  30000 | hcl     | -           | 2023-02-21    | 2023-02-20 | N         |             1 |
+|      1 | poorna   |  45000 | hcl     | -           | 2023-02-21    | NULL       | Y         |             2 |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+2 rows in set (0.00 sec)
+
+mysql>  update employee
+    -> set company="wipro"
+    -> where emp_id=1;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+mysql>insert into employee values(2,"chandu",35000,"tcs");
+Query OK, 1 row affected (0.01 sec)
+
+
+mysql> select * from employee_history;
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+| emp_id | emp_Name | salary | company | pre_company | Starting_Date | End_Date   | indicator | surrogate_key |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+|      1 | poorna   |  30000 | wipro   | hcl         | 2023-02-21    | 2023-02-20 | N         |             1 |
+|      1 | poorna   |  45000 | wipro   | hcl         | 2023-02-21    | NULL       | Y         |             2 |
+|      2 | chandu   |  35000 | tcs     | -           | 2023-02-21    | NULL       | Y         |             1 |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+3 rows in set (0.00 sec)
+
+
+mysql>  update employee
+    -> set emp_Name="jack"
+    -> where emp_id=2;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from employee_history;
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+| emp_id | emp_Name | salary | company | pre_company | Starting_Date | End_Date   | indicator | surrogate_key |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+|      1 | poorna   |  30000 | wipro   | hcl         | 2023-02-21    | 2023-02-20 | N         |             1 |
+|      1 | poorna   |  45000 | wipro   | hcl         | 2023-02-21    | NULL       | Y         |             2 |
+|      2 | jack     |  35000 | tcs     | -           | 2023-02-21    | NULL       | Y         |             1 |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+3 rows in set (0.00 sec)
+
+mysql> 
+
+mysql> update employee set emp_name="mani kumar"  where emp_id=101;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> insert into employee values(3,"jim",25000,"pwc");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from employee_history;
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+| emp_id | emp_Name | salary | company | pre_company | Starting_Date | End_Date   | indicator | surrogate_key |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+|      1 | poorna   |  30000 | wipro   | hcl         | 2023-02-21    | 2023-02-20 | N         |             1 |
+|      1 | poorna   |  45000 | wipro   | hcl         | 2023-02-21    | NULL       | Y         |             2 |
+|      2 | jack     |  35000 | tcs     | -           | 2023-02-21    | NULL       | Y         |             1 |
+|      3 | jim      |  25000 | pwc     | -           | 2023-02-21    | NULL       | Y         |             1 |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+4 rows in set (0.00 sec)
+
+mysql> update employee
+    -> set company = "infosys"
+    -> where emp_Name ="jim";
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from employee_history;
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+| emp_id | emp_Name | salary | company | pre_company | Starting_Date | End_Date   | indicator | surrogate_key |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+|      1 | poorna   |  30000 | wipro   | hcl         | 2023-02-21    | 2023-02-20 | N         |             1 |
+|      1 | poorna   |  45000 | wipro   | hcl         | 2023-02-21    | NULL       | Y         |             2 |
+|      2 | jack     |  35000 | tcs     | -           | 2023-02-21    | NULL       | Y         |             1 |
+|      3 | jim      |  25000 | infosys | pwc         | 2023-02-21    | NULL       | Y         |             1 |
++--------+----------+--------+---------+-------------+---------------+------------+-----------+---------------+
+4 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
