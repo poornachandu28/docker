@@ -1,3 +1,16 @@
+mysql> create table employee_history(emp_id int,emp_Name varchar(225),salary int,company varchar(225),pre_company varchar(225),Starting_Date DATE, End_Date DATE,indicator varchar(225),surrogate_key int);
+Query OK, 0 rows affected (0.03 sec)
+
+
+
+mysql> create table employee_history(emp_id int,emp_Name varchar(225),salary int,company varchar(225),pre_company varchar(225),Starting_Date DATE, End_Date DATE,indicator varchar(225),surrogate_key int);
+Query OK, 0 rows affected (0.03 sec)
+
+
+
+
+
+
 mysql> desc employee;
 +----------+-------------+------+-----+---------+-------+
 | Field    | Type        | Null | Key | Default | Extra |
@@ -27,11 +40,12 @@ mysql> desc employee_history;
 
 mysql>
     
-[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 
+
+######################################################
 
 DELIMITER $$
-CREATE TRIGGER trigger1
+CREATE TRIGGER trigger11
 AFTER insert ON employee
 FOR EACH ROW
 BEGIN
@@ -41,10 +55,10 @@ END $$
 DELIMITER ;
 
 
-uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+####################################################
 
 DELIMITER $$
-CREATE TRIGGER trigger3
+CREATE TRIGGER trigger22
 AFTER update ON employee
 FOR EACH ROW
 BEGIN
@@ -55,10 +69,12 @@ if new.salary != old.salary then
 end if;
 END $$
 DELIMITER ;
-=========================================================================================================================================================================
+
+
+###############################################################################3
 
 DELIMITER $$
-CREATE TRIGGER trigger5
+CREATE TRIGGER trigger33
 AFTER update ON employee
 FOR EACH ROW
 BEGIN
@@ -68,10 +84,15 @@ BEGIN
   end if;
 END $$
 DELIMITER ;
-=========================================================================================================================================================================
+
+
+
+####################################################################################
+
+
 
 DELIMITER $$
-CREATE TRIGGER TRIGGER4
+CREATE TRIGGER TRIGGER44
 AFTER UPDATE ON EMPLOYEE
 FOR EACH ROW
 BEGIN
@@ -82,11 +103,11 @@ END $$
 DELIMITER ;
 
 
-
+#############################################################################
 
 
 DELIMITER $$
-CREATE TRIGGER TRIGGER6
+CREATE TRIGGER TRIGGER55
 AFTER UPDATE ON EMPLOYEE
 FOR EACH ROW
 BEGIN
@@ -96,7 +117,7 @@ END IF;
 END $$
 DELIMITER ;
 
-
+###################################################################################
 
 
 DELIMITER $$
@@ -122,6 +143,9 @@ END$$
 DELIMITER ;
 
 
+##########################################################################################
+
+
 DELIMITER $$
 CREATE TRIGGER reset
 BEFORE INSERT ON employee_history
@@ -136,8 +160,10 @@ BEGIN
   
 END$$
 DELIMITER ;
+ 
+ 
+#######################################################################################33
 
-==========================================================================================================================================================================
 
 mysql> insert into employee values(1,"poorna",30000,"hcl");
 Query OK, 1 row affected (0.01 sec)
